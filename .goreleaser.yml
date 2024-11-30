@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=jcroql
+version: 2
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+
+builds:
+  - flags:
+      - -trimpath
+    ldflags:
+      - -w -s
+      - -X 'github.com/jumpserver/wisp/cmd.Version={{ .Tag }}'
+      - -X 'github.com/jumpserver/wisp/cmd.BuildTime={{ .Date }}'
+      - -X 'github.com/jumpserver/wisp/cmd.GitCommit={{ .ShortCommit }}'
+      - -X 'github.com/jumpserver/wisp/cmd.GoVersion={{ .Env.GOVERSION }}'
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - loong64
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: "{{ .Binary }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{- if .Arm }}v{{ .Arm }}{{ end }}"
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
