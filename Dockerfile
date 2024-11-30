@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     set -ex; \
     go install github.com/goreleaser/goreleaser/v2@${GORELEASER_VERSION}
 
-ARG VERSION
+ARG VERSION=v0.2.3
 
 ARG WORKDIR=/opt/wisp
 
